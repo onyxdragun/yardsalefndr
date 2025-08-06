@@ -43,8 +43,8 @@ export async function POST(request: NextRequest) {
     // Prepare email content
     const emailData = {
       from: `YardSaleFndr Contact <noreply@mg.dynamicshark.com>`,
-      to: 'info@yardsalefndr.com', // This should be your actual email
-      subject: `Contact Form: ${subject}`,
+      to: 'info@dynamicshark.com', // This should be your actual email
+      subject: `YSF Contact Form: ${subject}`,
       text: `
 New contact form submission from YardSaleFndr:
 
