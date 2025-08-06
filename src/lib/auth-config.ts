@@ -5,6 +5,10 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import { DatabaseService } from '@/lib/database';
 import bcrypt from 'bcryptjs';
 
+// Check if we're in production
+const isProduction = process.env.NODE_ENV === 'production';
+const isHttps = process.env.NEXTAUTH_URL?.startsWith('https://') || isProduction;
+
 export const authOptions: AuthOptions = {
   providers: [
     GoogleProvider({
@@ -101,7 +105,59 @@ export const authOptions: AuthOptions = {
   pages: {
     signIn: '/auth/signin',
   },
+  cookies: {
+    sessionToken: {
+      name: `${isHttps ? '__Secure-' : ''}next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: isHttps,
+      },
+    },
+    callbackUrl: {
+      name: `${isHttps ? '__Secure-' : ''}next-auth.callback-url`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: isHttps,
+      },
+    },
+    csrfToken: {
+      name: `${isHttps ? '__Host-' : ''}next-auth.csrf-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: isHttps,
+      },
+    },
+    pkceCodeVerifier: {
+      name: `${isHttps ? '__Secure-' : ''}next-auth.pkce.code_verifier`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: isHttps,
+        maxAge: 900, // 15 minutes
+      },
+    },
+    state: {
+      name: `${isHttps ? '__Secure-' : ''}next-auth.state`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: isHttps,
+        maxAge: 900, // 15 minutes
+      },
+    },
+  },
   session: {
     strategy: 'jwt' as const,
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
+  useSecureCookies: isHttps,
+  debug: !isProduction, // Enable debug in development
 };
